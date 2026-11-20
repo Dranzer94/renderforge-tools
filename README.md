@@ -9,7 +9,7 @@ Tools with good official Windows builds (FFmpeg via BtbN, x264 via VideoLAN, MKV
 | Tool | Upstream | Output | Status |
 | --- | --- | --- | --- |
 | x265 | [multicoreware/x265_git](https://bitbucket.org/multicoreware/x265_git) numeric tags (`4.2`) | `x265.exe`, static, 8/10/12-bit multilib | in workflow |
-| SVT-AV1 | [AOMediaCodec/SVT-AV1](https://gitlab.com/AOMediaCodec/SVT-AV1) `vX.Y.Z` tags | `SvtAv1EncApp.exe`, static | in workflow |
+| SVT-AV1 | [AOMediaCodec/SVT-AV1](https://github.com/AOMediaCodec/SVT-AV1) (GitHub mirror of GitLab; newest tags appear there first) `vX.Y.Z` tags | `SvtAv1EncApp.exe`, static | in workflow |
 | aomenc | libaom | `aomenc.exe` | planned |
 | dav1d | VideoLAN dav1d | `dav1d.exe` | planned |
 | vpxenc | libvpx | `vpxenc.exe` | planned |

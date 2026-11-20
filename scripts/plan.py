@@ -29,8 +29,8 @@ TOOLS = {
         "git": "https://github.com/AOMediaCodec/SVT-AV1.git",
         "tag_regex": r"^v(\d+\.\d+\.\d+)$",
         "ref_template": "v{version}",
-        "notes_url": "https://gitlab.com/AOMediaCodec/SVT-AV1/-/blob/v{version}/CHANGELOG.md",
-        "source_url": "https://gitlab.com/AOMediaCodec/SVT-AV1/-/tree/v{version}",
+        "notes_url": "https://github.com/AOMediaCodec/SVT-AV1/blob/v{version}/CHANGELOG.md",
+        "source_url": "https://github.com/AOMediaCodec/SVT-AV1/tree/v{version}",
     },
 }
 
