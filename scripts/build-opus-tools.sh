@@ -3,7 +3,8 @@
 # linked against current MSYS2 libopus/libogg/opusfile/libopusenc/FLAC.
 source "$(dirname "$0")/lib.sh"
 fetch_src
-export CFLAGS="-O2 -std=gnu17 -fpermissive"
+# FLAC__NO_DLL: link MSYS2 libFLAC statically (its headers default to dllimport).
+export CFLAGS="-O2 -std=gnu17 -fpermissive -DFLAC__NO_DLL"
 cd "$SRC"
 ./configure --disable-dependency-tracking
 make -j "$JOBS" LDFLAGS="$LT_STATIC_LDFLAGS"
