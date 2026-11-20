@@ -4,12 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       tool:
-        description: Tool to build
-        type: choice
-        options: [all, x265, svt-av1]
+        description: >-
+          Tool id (x265, svt-av1, aom, dav1d, vpx, uvg266, vvenc, vvdec, svt-hevc, svt-vp9,
+          xvid, lame, exhale, speex, vorbis-tools, sox, fdkaac), a comma list,
+          "standard" (everything except opt-in tools) or "all"
+        type: string
         default: all
       version:
-        description: Upstream version override (single tool only; blank = latest tag)
+        description: Upstream version override (single tool only; blank = latest)
         type: string
         default: ""
       force:
@@ -17,7 +19,7 @@ on:
         type: boolean
         default: false
   schedule:
-    # Weekly upstream tag check, Mondays 04:17 UTC. Only missing releases are built.
+    # Weekly upstream check, Mondays 04:17 UTC. Only versions without a release are built.
     - cron: "17 4 * * 1"
 
 permissions:
@@ -49,6 +51,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 90
     strategy:
+      # Every tool is its own job: one failure never cancels or blocks the others.
       fail-fast: false
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     name: ${{ matrix.tool }} ${{ matrix.version }}
@@ -64,26 +67,28 @@ jobs:
           # A full pacman -Syu on every run hit a mirror HTTP 500 on the first run;
           # the runner image is recent enough, so skip it to cut flakiness.
           update: false
-          install: git zip
-          pacboy: >-
-            toolchain:p
-            cmake:p
-            ninja:p
-            nasm:p
+          install: git zip unzip make diffutils
+          pacboy: ${{ matrix.pkgs }}
 
       - name: Build
-        run: bash scripts/build-${{ matrix.tool }}.sh "${{ matrix.git }}" "${{ matrix.ref }}" "out/${{ matrix.tool }}"
+        env:
+          VERSION: ${{ matrix.version }}
+        run: bash scripts/build-${{ matrix.tool }}.sh "${{ matrix.src }}" "${{ matrix.ref }}" "out/${{ matrix.tool }}"
 
-      - name: Check the exe has no MSYS2 DLL dependencies
+      - name: Check the exes have no MSYS2 DLL dependencies
         run: |
-          exe=$(ls out/${{ matrix.tool }}/*.exe)
-          ldd "$exe"
-          if ldd "$exe" | grep -i "/ucrt64/"; then
-            echo "::error::$exe depends on MSYS2 DLLs; it must be fully static"; exit 1
-          fi
+          set -euo pipefail
+          shopt -s nullglob
+          exes=(out/${{ matrix.tool }}/*.exe)
+          [ ${#exes[@]} -gt 0 ] || { echo "::error::no exe in out/${{ matrix.tool }}"; exit 1; }
+          for exe in "${exes[@]}"; do
+            echo "== $exe"; ldd "$exe"
+            if ldd "$exe" | grep -i "/ucrt64/"; then
+              echo "::error::$exe depends on MSYS2 DLLs; it must be fully static"; exit 1
+            fi
+          done
 
       - name: Package
-        id: package
         run: |
           set -euo pipefail
           name="${{ matrix.tool }}-${{ matrix.version }}-win64"
@@ -92,8 +97,8 @@ jobs:
             echo "tool: ${{ matrix.tool }}"
             echo "upstream_version: ${{ matrix.version }}"
             echo "upstream_ref: ${{ matrix.ref }}"
-            echo "upstream_git: ${{ matrix.git }}"
-            echo "upstream_commit: $(git -C work-${{ matrix.tool }}/src rev-parse HEAD)"
+            echo "upstream_source: ${{ matrix.src }}"
+            echo "upstream_commit_or_archive: $(cat work-${{ matrix.tool }}/source-id.txt 2>/dev/null | tr '\n' ' ')"
             echo "compiler: $(gcc --version | head -1)"
             echo "toolchain: MSYS2 UCRT64, static link"
             echo "built_by: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
@@ -101,7 +106,8 @@ jobs:
           } > "$dir/BUILDINFO.txt"
           mkdir -p dist
           (cd "$dir" && zip -9 -r "../../dist/$name.zip" .)
-          (cd dist && sha256sum "$name.zip" > checksums.sha256 && cat checksums.sha256)
+          (cd dist && sha256sum "$name.zip" > SHA256SUMS && cp SHA256SUMS checksums.sha256 && cat SHA256SUMS)
+          unzip -l "dist/$name.zip"
 
       - name: Publish release
         shell: bash
@@ -109,9 +115,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          sha=$(cut -d' ' -f1 dist/checksums.sha256)
+          sha=$(cut -d' ' -f1 dist/SHA256SUMS)
+          title="${{ matrix.tool }} ${{ matrix.version }} (Windows x64)"
+          optin_note=""
+          if [ "${{ matrix.optin }}" = "true" ]; then
+            title="${{ matrix.tool }} ${{ matrix.version }} (Windows x64) - OPT-IN, restricted licence"
+            optin_note="> **Opt-in only.** This build links libfdk-aac, which is under the Fraunhofer FDK AAC licence. That licence allows redistribution with its notice but grants **no patent licence** for AAC, and it is not GPL-compatible. RenderForge must never install this automatically: the user has to enable it and accept the licence warning. See README-LICENCE.txt in the zip and LICENSES.md in this repo."
+          fi
           cat > notes.md <<NOTES
-          Windows x64 build of **${{ matrix.tool }} ${{ matrix.version }}** from the upstream tag \`${{ matrix.ref }}\`, built unmodified with MSYS2 UCRT64 (static).
+          ${optin_note}
+
+          Windows x64 build of **${{ matrix.tool }} ${{ matrix.version }}** from upstream \`${{ matrix.ref }}\`, built unmodified with MSYS2 UCRT64 (static, no DLLs needed).
 
           - Upstream changelog: ${{ matrix.notes_url }}
           - Upstream source: ${{ matrix.source_url }}
@@ -121,11 +135,11 @@ jobs:
 
           Consumed by the RenderForge Encoder Manager. See LICENSES.md in this repo for licence notes.
           NOTES
+          sed -i 's/^          //' notes.md
           if gh release view "${{ matrix.tag }}" >/dev/null 2>&1; then
-            gh release upload "${{ matrix.tag }}" dist/*.zip dist/checksums.sha256 --clobber
-            gh release edit "${{ matrix.tag }}" --notes-file notes.md
+            gh release upload "${{ matrix.tag }}" dist/*.zip dist/SHA256SUMS dist/checksums.sha256 --clobber
+            gh release edit "${{ matrix.tag }}" --title "$title" --notes-file notes.md
           else
-            gh release create "${{ matrix.tag }}" dist/*.zip dist/checksums.sha256 \
-              --title "${{ matrix.tool }} ${{ matrix.version }} (Windows x64)" \
-              --notes-file notes.md --latest=false
+            gh release create "${{ matrix.tag }}" dist/*.zip dist/SHA256SUMS dist/checksums.sha256 \
+              --title "$title" --notes-file notes.md --latest=false
           fi

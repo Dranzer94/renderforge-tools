@@ -1,39 +1,36 @@
 #!/usr/bin/env bash
-# Build a static multilib (8/10/12-bit) x265.exe in an MSYS2 UCRT64 shell.
-# Usage: build-x265.sh <git-url> <ref> <out-dir>
-set -euo pipefail
-GIT_URL="$1"; REF="$2"; OUT="$3"
-WORK="$(pwd)/work-x265"
-rm -rf "$WORK" && mkdir -p "$WORK" "$OUT"
-# Full clone of one tag (x265's CMake reads the version with git describe).
-git clone --branch "$REF" --single-branch "$GIT_URL" "$WORK/src"
+# Static multilib (8/10/12-bit) x265.exe.
+source "$(dirname "$0")/lib.sh"
+# Full single-branch clone of the tag: x265's CMake reads its version with git describe.
+git -c advice.detachedHead=false clone --branch "$REF" --single-branch "$SRC_URL" "$SRC"
+git -C "$SRC" rev-parse HEAD > "$WORK/source-id.txt"
 
-# x265 still declares an old cmake_minimum_required; CMake 4 needs this policy floor.
 COMMON=(-G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_SHARED=OFF
         -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DENABLE_ASSEMBLY=ON)
 
-cmake -S "$WORK/src/source" -B "$WORK/12bit" "${COMMON[@]}" \
+cmake -S "$SRC/source" -B "$WORK/12bit" "${COMMON[@]}" \
   -DHIGH_BIT_DEPTH=ON -DMAIN12=ON -DEXPORT_C_API=OFF -DENABLE_CLI=OFF
-cmake --build "$WORK/12bit"
+cmake --build "$WORK/12bit" -j "$JOBS"
 
-cmake -S "$WORK/src/source" -B "$WORK/10bit" "${COMMON[@]}" \
+cmake -S "$SRC/source" -B "$WORK/10bit" "${COMMON[@]}" \
   -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_CLI=OFF
-cmake --build "$WORK/10bit"
+cmake --build "$WORK/10bit" -j "$JOBS"
 
 mkdir -p "$WORK/8bit"
 cp "$WORK/12bit/libx265.a" "$WORK/8bit/libx265_main12.a"
 cp "$WORK/10bit/libx265.a" "$WORK/8bit/libx265_main10.a"
-cmake -S "$WORK/src/source" -B "$WORK/8bit" "${COMMON[@]}" \
+# x265's CMake wraps EXTRA_LIB in "-Wl,-Bstatic ... -Wl,-Bdynamic", which made the
+# 20 Nov run link libstdc++/libgcc_s/libwinpthread dynamically even with -static.
+# Ending the standard library list with -Wl,-Bstatic switches the linker back to
+# static mode for the runtime libraries GCC appends after it.
+cmake -S "$SRC/source" -B "$WORK/8bit" "${COMMON[@]}" \
   -DEXTRA_LIB="x265_main10.a;x265_main12.a" \
-  -DEXTRA_LINK_FLAGS="-L$WORK/8bit -static" \
+  -DEXTRA_LINK_FLAGS="-L$WORK/8bit" \
   -DLINKED_10BIT=ON -DLINKED_12BIT=ON -DSTATIC_LINK_CRT=ON \
-  -DCMAKE_EXE_LINKER_FLAGS="-static -static-libgcc -static-libstdc++"
-# First run: CMAKE_EXE_LINKER_FLAGS alone still produced an exe that needed
-# libstdc++/libgcc_s/libwinpthread DLLs, so -static also goes into the target's
-# own LINK_FLAGS (EXTRA_LINK_FLAGS), and the link line is logged (-v).
-cmake --build "$WORK/8bit" -v
+  "-DCMAKE_EXE_LINKER_FLAGS=$STATIC_LINK" \
+  "-DCMAKE_CXX_STANDARD_LIBRARIES=-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -Wl,-Bstatic"
+cmake --build "$WORK/8bit" -j "$JOBS" -v
 
-cp "$WORK/8bit/x265.exe" "$OUT/"
-cp "$WORK/src/COPYING" "$OUT/COPYING.txt"
-strip "$OUT/x265.exe"
-"$OUT/x265.exe" --version 2>&1 | tee "$OUT/version.txt"
+install_exe "$WORK/8bit/x265.exe"
+install_doc "$SRC/COPYING" COPYING.txt
+record_version "$OUT/x265.exe" --version
