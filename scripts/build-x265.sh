@@ -24,10 +24,14 @@ mkdir -p "$WORK/8bit"
 cp "$WORK/12bit/libx265.a" "$WORK/8bit/libx265_main12.a"
 cp "$WORK/10bit/libx265.a" "$WORK/8bit/libx265_main10.a"
 cmake -S "$WORK/src/source" -B "$WORK/8bit" "${COMMON[@]}" \
-  -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS="-L$WORK/8bit" \
-  -DLINKED_10BIT=ON -DLINKED_12BIT=ON \
+  -DEXTRA_LIB="x265_main10.a;x265_main12.a" \
+  -DEXTRA_LINK_FLAGS="-L$WORK/8bit -static" \
+  -DLINKED_10BIT=ON -DLINKED_12BIT=ON -DSTATIC_LINK_CRT=ON \
   -DCMAKE_EXE_LINKER_FLAGS="-static -static-libgcc -static-libstdc++"
-cmake --build "$WORK/8bit"
+# First run: CMAKE_EXE_LINKER_FLAGS alone still produced an exe that needed
+# libstdc++/libgcc_s/libwinpthread DLLs, so -static also goes into the target's
+# own LINK_FLAGS (EXTRA_LINK_FLAGS), and the link line is logged (-v).
+cmake --build "$WORK/8bit" -v
 
 cp "$WORK/8bit/x265.exe" "$OUT/"
 cp "$WORK/src/COPYING" "$OUT/COPYING.txt"
