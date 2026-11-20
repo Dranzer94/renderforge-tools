@@ -6,7 +6,7 @@ on:
       tool:
         description: >-
           Tool id (x265, svt-av1, aom, dav1d, vpx, uvg266, vvenc, vvdec, svt-hevc, svt-vp9,
-          xvid, lame, exhale, speex, vorbis-tools, sox, opus-tools, libavif, webp, fdkaac), a comma list,
+          xvid, lame, exhale, speex, vorbis-tools, sox, opus-tools, webp, fdkaac), a comma list,
           "standard" (everything except opt-in tools) or "all"
         type: string
         default: all

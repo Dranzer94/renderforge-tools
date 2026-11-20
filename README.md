@@ -10,31 +10,33 @@ Status is updated after each workflow change; the Releases page is the source of
 
 | Tool id (tag prefix) | Upstream (version source) | Exe(s) in the zip | Status |
 | --- | --- | --- | --- |
-| `x265` | [multicoreware/x265_git](https://bitbucket.org/multicoreware/x265_git) numeric tags (`4.2`) | `x265.exe` (8/10/12-bit multilib) | STATUS_x265 |
-| `svt-av1` | [AOMediaCodec/SVT-AV1](https://github.com/AOMediaCodec/SVT-AV1) `vX.Y.Z` tags | `SvtAv1EncApp.exe` | STATUS_svt-av1 |
-| `aom` | [aomedia.googlesource.com/aom](https://aomedia.googlesource.com/aom) `vX.Y.Z` tags | `aomenc.exe`, `aomdec.exe` | STATUS_aom |
-| `dav1d` | [code.videolan.org/videolan/dav1d](https://code.videolan.org/videolan/dav1d) `X.Y.Z` tags | `dav1d.exe` | STATUS_dav1d |
-| `vpx` | [chromium.googlesource.com/webm/libvpx](https://chromium.googlesource.com/webm/libvpx) `vX.Y.Z` tags | `vpxenc.exe`, `vpxdec.exe` (VP9 high bit depth) | STATUS_vpx |
-| `uvg266` | [ultravideo/uvg266](https://github.com/ultravideo/uvg266) `vX.Y.Z` tags | `uvg266.exe` | STATUS_uvg266 |
-| `vvenc` | [fraunhoferhhi/vvenc](https://github.com/fraunhoferhhi/vvenc) `vX.Y.Z` tags | `vvencapp.exe`, `vvencFFapp.exe` | STATUS_vvenc |
-| `vvdec` | [fraunhoferhhi/vvdec](https://github.com/fraunhoferhhi/vvdec) `vX.Y.Z` tags | `vvdecapp.exe` | STATUS_vvdec |
-| `svt-hevc` | [OpenVisualCloud/SVT-HEVC](https://github.com/OpenVisualCloud/SVT-HEVC) `vX.Y.Z` tags (archived upstream) | `SvtHevcEncApp.exe` | STATUS_svt-hevc |
-| `svt-vp9` | [OpenVisualCloud/SVT-VP9](https://github.com/OpenVisualCloud/SVT-VP9) `vX.Y.Z` tags | `SvtVp9EncApp.exe` | STATUS_svt-vp9 |
-| `xvid` | [downloads.xvid.com](https://downloads.xvid.com/downloads/) `xvidcore-X.Y.Z.tar.gz` | `xvid_encraw.exe` | STATUS_xvid |
-| `lame` | [SourceForge lame](https://sourceforge.net/projects/lame/files/lame/) release tarballs | `lame.exe` | STATUS_lame |
-| `exhale` | [gitlab.com/ecodis/exhale](https://gitlab.com/ecodis/exhale) `vX.Y.Z` tags | `exhale.exe` | STATUS_exhale |
-| `speex` | [xiph/speex](https://gitlab.xiph.org/xiph/speex) `Speex-X.Y.Z` tags, xiph release tarball | `speexenc.exe`, `speexdec.exe` | STATUS_speex |
-| `vorbis-tools` | [xiph/vorbis-tools](https://gitlab.xiph.org/xiph/vorbis-tools) `vX.Y.Z` tags, xiph release tarball | `oggenc.exe`, `oggdec.exe`, `ogginfo.exe`, `vorbiscomment.exe` | STATUS_vorbis-tools |
-| `sox` | [SourceForge sox](https://sourceforge.net/projects/sox/files/sox/) release tarballs | `sox.exe` (WAV/AIFF/raw plus built-in effects only) | STATUS_sox |
-| `fdkaac` (**opt-in**) | [nu774/fdkaac](https://github.com/nu774/fdkaac) `vX.Y.Z` tags + newest [mstorsjo/fdk-aac](https://github.com/mstorsjo/fdk-aac) tag | `fdkaac.exe` | STATUS_fdkaac |
+| `x265` | [multicoreware/x265_git](https://bitbucket.org/multicoreware/x265_git) numeric tags (`4.2`) | `x265.exe` (8/10/12-bit multilib) | built: [`x265-4.2`](https://github.com/Dranzer94/renderforge-tools/releases/tag/x265-4.2) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44821672876)) |
+| `svt-av1` | [AOMediaCodec/SVT-AV1](https://github.com/AOMediaCodec/SVT-AV1) `vX.Y.Z` tags | `SvtAv1EncApp.exe` | built: [`svt-av1-4.3.1`](https://github.com/Dranzer94/renderforge-tools/releases/tag/svt-av1-4.3.1) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44801125322)) |
+| `aom` | [aomedia.googlesource.com/aom](https://aomedia.googlesource.com/aom) `vX.Y.Z` tags | `aomenc.exe`, `aomdec.exe` | built: [`aom-3.15.3`](https://github.com/Dranzer94/renderforge-tools/releases/tag/aom-3.15.3) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44821672876)) |
+| `dav1d` | [code.videolan.org/videolan/dav1d](https://code.videolan.org/videolan/dav1d) `X.Y.Z` tags | `dav1d.exe` | built: [`dav1d-1.5.5`](https://github.com/Dranzer94/renderforge-tools/releases/tag/dav1d-1.5.5) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44821672876)) |
+| `vpx` | [chromium.googlesource.com/webm/libvpx](https://chromium.googlesource.com/webm/libvpx) `vX.Y.Z` tags | `vpxenc.exe`, `vpxdec.exe` (VP9 high bit depth) | built: [`vpx-1.17.0`](https://github.com/Dranzer94/renderforge-tools/releases/tag/vpx-1.17.0) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44821672876)) |
+| `uvg266` | [ultravideo/uvg266](https://github.com/ultravideo/uvg266) `vX.Y.Z` tags | `uvg266.exe` | built: [`uvg266-0.8.1`](https://github.com/Dranzer94/renderforge-tools/releases/tag/uvg266-0.8.1) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44821672876)) |
+| `vvenc` | [fraunhoferhhi/vvenc](https://github.com/fraunhoferhhi/vvenc) `vX.Y.Z` tags | `vvencapp.exe`, `vvencFFapp.exe` | built: [`vvenc-1.14.0`](https://github.com/Dranzer94/renderforge-tools/releases/tag/vvenc-1.14.0) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44821672876)) |
+| `vvdec` | [fraunhoferhhi/vvdec](https://github.com/fraunhoferhhi/vvdec) `vX.Y.Z` tags | `vvdecapp.exe` | built: [`vvdec-3.3.0`](https://github.com/Dranzer94/renderforge-tools/releases/tag/vvdec-3.3.0) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44821672876)) |
+| `svt-hevc` | [OpenVisualCloud/SVT-HEVC](https://github.com/OpenVisualCloud/SVT-HEVC) `vX.Y.Z` tags (archived upstream) | `SvtHevcEncApp.exe` | built: [`svt-hevc-1.5.1`](https://github.com/Dranzer94/renderforge-tools/releases/tag/svt-hevc-1.5.1) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44821672876)) |
+| `svt-vp9` | [OpenVisualCloud/SVT-VP9](https://github.com/OpenVisualCloud/SVT-VP9) `vX.Y.Z` tags | `SvtVp9EncApp.exe` | built: [`svt-vp9-0.3.1`](https://github.com/Dranzer94/renderforge-tools/releases/tag/svt-vp9-0.3.1) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44821672876)) |
+| `xvid` | [downloads.xvid.com](https://downloads.xvid.com/downloads/) `xvidcore-X.Y.Z.tar.gz` | `xvid_encraw.exe` | built: [`xvid-1.3.7`](https://github.com/Dranzer94/renderforge-tools/releases/tag/xvid-1.3.7) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44827293538)) |
+| `lame` | [SourceForge lame](https://sourceforge.net/projects/lame/files/lame/) release tarballs | `lame.exe` | built: [`lame-4.0`](https://github.com/Dranzer94/renderforge-tools/releases/tag/lame-4.0) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44827293538)) |
+| `exhale` | [gitlab.com/ecodis/exhale](https://gitlab.com/ecodis/exhale) `vX.Y.Z` tags | `exhale.exe` | built: [`exhale-1.2.2`](https://github.com/Dranzer94/renderforge-tools/releases/tag/exhale-1.2.2) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44822964808)) |
+| `speex` | [xiph/speex](https://gitlab.xiph.org/xiph/speex) `Speex-X.Y.Z` tags, xiph release tarball | `speexenc.exe`, `speexdec.exe` | built: [`speex-1.2.1`](https://github.com/Dranzer94/renderforge-tools/releases/tag/speex-1.2.1) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44822964808)) |
+| `vorbis-tools` | [xiph/vorbis-tools](https://gitlab.xiph.org/xiph/vorbis-tools) `vX.Y.Z` tags, xiph release tarball | `oggenc.exe`, `oggdec.exe`, `ogginfo.exe`, `vorbiscomment.exe` | built: [`vorbis-tools-1.4.3`](https://github.com/Dranzer94/renderforge-tools/releases/tag/vorbis-tools-1.4.3) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44822964808)) |
+| `sox` | [SourceForge sox](https://sourceforge.net/projects/sox/files/sox/) release tarballs | `sox.exe` (WAV/AIFF/raw plus built-in effects only) | built: [`sox-14.4.2`](https://github.com/Dranzer94/renderforge-tools/releases/tag/sox-14.4.2) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44822964808)) |
+| `opus-tools` | [xiph/opus-tools](https://gitlab.xiph.org/xiph/opus-tools) `vX.Y` tags, xiph release tarball, current MSYS2 libopus | `opusenc.exe`, `opusdec.exe`, `opusinfo.exe` | built: [`opus-tools-0.2`](https://github.com/Dranzer94/renderforge-tools/releases/tag/opus-tools-0.2) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44829360213)), libopus 1.6.1 |
+| `webp` | [chromium.googlesource.com/webm/libwebp](https://chromium.googlesource.com/webm/libwebp) `vX.Y.Z` tags | `cwebp.exe`, `dwebp.exe`, `img2webp.exe`, `webpinfo.exe`, `webpmux.exe` (PNG/JPEG input) | built: [`webp-1.6.0`](https://github.com/Dranzer94/renderforge-tools/releases/tag/webp-1.6.0) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44828056705)) |
+| `fdkaac` (**opt-in**) | [nu774/fdkaac](https://github.com/nu774/fdkaac) `vX.Y.Z` tags + newest [mstorsjo/fdk-aac](https://github.com/mstorsjo/fdk-aac) tag | `fdkaac.exe` | built: [`fdkaac-1.0.9`](https://github.com/Dranzer94/renderforge-tools/releases/tag/fdkaac-1.0.9) ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44821672876)) |
 
 ### Not built here, because a reliable official Windows build exists
 
+opus-tools and WebP also have official Windows builds (Mozilla's `opus-tools-0.2-win64.zip`, Google's `libwebp-<v>-windows-x64.zip`); they are built here as well so RenderForge gets newer libraries and the same release pattern, and the official builds stay listed as alternatives in the catalogue.
+
 | Tool | Use instead |
 | --- | --- |
-| opusenc (opus-tools) | Official `https://archive.mozilla.org/pub/opus/win64/opus-tools-<v>-win64.zip` (0.2 is still the newest upstream release). |
 | avifenc (libavif) | Official `windows-artifacts.zip` on [AOMediaCodec/libavif releases](https://github.com/AOMediaCodec/libavif/releases). |
-| cwebp (libwebp) | Official Google builds: `https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-<v>-windows-x64.zip`. |
 | mpv | Official `mpv-v<v>-x86_64-pc-windows-msvc.zip` on [mpv-player/mpv releases](https://github.com/mpv-player/mpv/releases) (since 0.41). |
 | Av1an | Official rolling `av1an.exe` on the [rust-av/Av1an `latest` release](https://github.com/rust-av/Av1an/releases/tag/latest). Tagged releases have no binaries. Needs VapourSynth or FFMS2 at run time. |
 | cyanrip | Official `cyanrip-win64.exe` on [cyanreg/cyanrip releases](https://github.com/cyanreg/cyanrip/releases). |
@@ -92,7 +94,13 @@ Builds use upstream source unmodified, except for these small Windows build fixe
 
 ## Blocked or skipped tools
 
-BLOCKERS
+| Tool | Why it isn't built |
+| --- | --- |
+| libavif (avifenc) | First attempt ([run](https://github.com/Dranzer94/renderforge-tools/actions/runs/44828056705)) built, but CMake picked MSYS2's DLL import libraries for libaom, dav1d, libpng, libjpeg and zlib, so the exe failed the no-DLL check. A static build needs libavif's `LOCAL` codec/image-library options (building aom, dav1d, libpng and libjpeg from source inside the job). Not worth it while the official `windows-artifacts.zip` (static `avifenc.exe`/`avifdec.exe`) exists, so it's removed from the schedule; `scripts/build-libavif.sh` stays as a starting point. |
+| Tesseract | Skipped on purpose: large, needs language data, not an encoder; UB-Mannheim's installer is the de-facto Windows build. |
+| mpv, Av1an, cyanrip, faac | Not needed: official Windows builds exist (table above). |
+
+Known limits: opus-tools upstream hasn't tagged since 0.2 (2018), so the weekly schedule won't rebuild it for newer libopus; dispatch `-f tool=opus-tools -f force=true` to refresh. The fdkaac build always takes the newest libfdk-aac tag at build time. SoX is a minimal build (no MP3/FLAC/Ogg formats).
 
 ## Visibility
 

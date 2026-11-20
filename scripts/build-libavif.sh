@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# NOT SCHEDULED (not in plan.py): CMake links MSYS2 DLL import libs, see README "Blocked or skipped tools".
 # Static avifenc.exe and avifdec.exe (libavif with MSYS2 libaom + dav1d, libpng, libjpeg).
 source "$(dirname "$0")/lib.sh"
 fetch_src

@@ -159,14 +159,6 @@ TOOLS: dict[str, dict] = {
         "notes_url": "https://gitlab.xiph.org/xiph/opus-tools/-/tags/v{version}",
         "source_url": "https://downloads.xiph.org/releases/opus/opus-tools-{version}.tar.gz",
     },
-    "libavif": {
-        "version": {"git": "https://github.com/AOMediaCodec/libavif.git", "regex": rf"^v{SEMVER}$"},
-        "src": "https://github.com/AOMediaCodec/libavif.git",
-        "ref": "v{version}",
-        "pkgs": "aom:p dav1d:p libpng:p libjpeg-turbo:p zlib:p",
-        "notes_url": "https://github.com/AOMediaCodec/libavif/blob/v{version}/CHANGELOG.md",
-        "source_url": "https://github.com/AOMediaCodec/libavif/tree/v{version}",
-    },
     "webp": {
         "version": {"git": "https://chromium.googlesource.com/webm/libwebp", "regex": rf"^v{SEMVER}$"},
         "src": "https://chromium.googlesource.com/webm/libwebp",
