@@ -13,4 +13,4 @@ install_exe "$(find_exe vpxdec.exe "$WORK/build")"
 install_doc "$SRC/LICENSE"
 install_doc "$SRC/PATENTS"
 install_doc "$SRC/AUTHORS"
-record_version "$OUT/vpxenc.exe" --help
+VERSION_GREP="WebM Project VP[89]" record_version "$OUT/vpxenc.exe" --help

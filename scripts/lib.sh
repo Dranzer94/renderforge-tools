@@ -87,6 +87,12 @@ install_doc() {
 }
 
 # record_version <cmd...>: save the tool's own version banner to version.txt.
+# The first line is always "<tool> <upstream version>" so RenderForge can read it
+# even for tools without a --version flag. An optional VERSION_GREP filters the output.
 record_version() {
-  { "$@" 2>&1 || true; } | head -n 20 | tee "$OUT/version.txt"
+  echo "$TOOL ${VERSION:-$REF}" > "$OUT/version.txt"
+  { "$@" 2>&1 || true; } \
+    | { if [ -n "${VERSION_GREP:-}" ]; then grep -E "$VERSION_GREP" || true; else cat; fi; } \
+    | head -n 20 >> "$OUT/version.txt"
+  cat "$OUT/version.txt"
 }

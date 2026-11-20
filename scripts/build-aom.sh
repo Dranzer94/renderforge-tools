@@ -9,4 +9,4 @@ install_exe "$(find_exe aomenc.exe "$WORK/build")"
 install_exe "$(find_exe aomdec.exe "$WORK/build")"
 install_doc "$SRC/LICENSE"
 install_doc "$SRC/PATENTS"
-record_version "$OUT/aomenc.exe" --help
+VERSION_GREP="AOMedia Project AV1" record_version "$OUT/aomenc.exe" --help
