@@ -34,7 +34,7 @@ jobs:
       matrix: ${{ steps.plan.outputs.matrix }}
       any: ${{ steps.plan.outputs.any }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - id: plan
         env:
           GH_TOKEN: ${{ github.token }}
@@ -56,12 +56,14 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: msys2/setup-msys2@v2
         with:
           msystem: UCRT64
-          update: true
+          # A full pacman -Syu on every run hit a mirror HTTP 500 on the first run;
+          # the runner image is recent enough, so skip it to cut flakiness.
+          update: false
           install: git zip
           pacboy: >-
             toolchain:p
