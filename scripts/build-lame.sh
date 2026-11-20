@@ -6,7 +6,7 @@ export CFLAGS="-O2 -std=gnu17"
 cd "$SRC"
 ./configure --disable-shared --enable-static --enable-nasm --disable-gtktest \
   --disable-dependency-tracking
-make -j "$JOBS"
+make -j "$JOBS" LDFLAGS="$LT_STATIC_LDFLAGS"
 install_exe "$(find_exe lame.exe "$SRC/frontend")"
 install_doc "$SRC/COPYING" COPYING.txt
 install_doc "$SRC/LICENSE" LICENSE.txt

@@ -4,5 +4,6 @@ source "$(dirname "$0")/lib.sh"
 fetch_src
 cmake_build "$SRC" "$WORK/build"
 install_exe "$(find_exe exhale.exe "$WORK/build" "$SRC/bin")"
-install_doc "$SRC/license.txt"
+install_doc "$SRC/include/License.htm"
+install_doc "$SRC/include/Release.htm"
 record_version "$OUT/exhale.exe"

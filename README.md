@@ -6,15 +6,50 @@ Tools with good official Windows builds (FFmpeg via BtbN, x264 via VideoLAN, MKV
 
 ## What is built
 
-| Tool | Upstream | Output | Status |
+Status is updated after each workflow change; the Releases page is the source of truth.
+
+| Tool id (tag prefix) | Upstream (version source) | Exe(s) in the zip | Status |
 | --- | --- | --- | --- |
-| x265 | [multicoreware/x265_git](https://bitbucket.org/multicoreware/x265_git) numeric tags (`4.2`) | `x265.exe`, static, 8/10/12-bit multilib | in workflow |
-| SVT-AV1 | [AOMediaCodec/SVT-AV1](https://github.com/AOMediaCodec/SVT-AV1) (GitHub mirror of GitLab; newest tags appear there first) `vX.Y.Z` tags | `SvtAv1EncApp.exe`, static | in workflow |
-| aomenc | libaom | `aomenc.exe` | planned |
-| dav1d | VideoLAN dav1d | `dav1d.exe` | planned |
-| vpxenc | libvpx | `vpxenc.exe` | planned |
-| vvenc | Fraunhofer vvenc | `vvencapp.exe` | planned |
-| others | uvg266, exhale, LAME, newer opus-tools, … | | planned, as the RenderForge catalogue needs them |
+| `x265` | [multicoreware/x265_git](https://bitbucket.org/multicoreware/x265_git) numeric tags (`4.2`) | `x265.exe` (8/10/12-bit multilib) | STATUS_x265 |
+| `svt-av1` | [AOMediaCodec/SVT-AV1](https://github.com/AOMediaCodec/SVT-AV1) `vX.Y.Z` tags | `SvtAv1EncApp.exe` | STATUS_svt-av1 |
+| `aom` | [aomedia.googlesource.com/aom](https://aomedia.googlesource.com/aom) `vX.Y.Z` tags | `aomenc.exe`, `aomdec.exe` | STATUS_aom |
+| `dav1d` | [code.videolan.org/videolan/dav1d](https://code.videolan.org/videolan/dav1d) `X.Y.Z` tags | `dav1d.exe` | STATUS_dav1d |
+| `vpx` | [chromium.googlesource.com/webm/libvpx](https://chromium.googlesource.com/webm/libvpx) `vX.Y.Z` tags | `vpxenc.exe`, `vpxdec.exe` (VP9 high bit depth) | STATUS_vpx |
+| `uvg266` | [ultravideo/uvg266](https://github.com/ultravideo/uvg266) `vX.Y.Z` tags | `uvg266.exe` | STATUS_uvg266 |
+| `vvenc` | [fraunhoferhhi/vvenc](https://github.com/fraunhoferhhi/vvenc) `vX.Y.Z` tags | `vvencapp.exe`, `vvencFFapp.exe` | STATUS_vvenc |
+| `vvdec` | [fraunhoferhhi/vvdec](https://github.com/fraunhoferhhi/vvdec) `vX.Y.Z` tags | `vvdecapp.exe` | STATUS_vvdec |
+| `svt-hevc` | [OpenVisualCloud/SVT-HEVC](https://github.com/OpenVisualCloud/SVT-HEVC) `vX.Y.Z` tags (archived upstream) | `SvtHevcEncApp.exe` | STATUS_svt-hevc |
+| `svt-vp9` | [OpenVisualCloud/SVT-VP9](https://github.com/OpenVisualCloud/SVT-VP9) `vX.Y.Z` tags | `SvtVp9EncApp.exe` | STATUS_svt-vp9 |
+| `xvid` | [downloads.xvid.com](https://downloads.xvid.com/downloads/) `xvidcore-X.Y.Z.tar.gz` | `xvid_encraw.exe` | STATUS_xvid |
+| `lame` | [SourceForge lame](https://sourceforge.net/projects/lame/files/lame/) release tarballs | `lame.exe` | STATUS_lame |
+| `exhale` | [gitlab.com/ecodis/exhale](https://gitlab.com/ecodis/exhale) `vX.Y.Z` tags | `exhale.exe` | STATUS_exhale |
+| `speex` | [xiph/speex](https://gitlab.xiph.org/xiph/speex) `Speex-X.Y.Z` tags, xiph release tarball | `speexenc.exe`, `speexdec.exe` | STATUS_speex |
+| `vorbis-tools` | [xiph/vorbis-tools](https://gitlab.xiph.org/xiph/vorbis-tools) `vX.Y.Z` tags, xiph release tarball | `oggenc.exe`, `oggdec.exe`, `ogginfo.exe`, `vorbiscomment.exe` | STATUS_vorbis-tools |
+| `sox` | [SourceForge sox](https://sourceforge.net/projects/sox/files/sox/) release tarballs | `sox.exe` (WAV/AIFF/raw plus built-in effects only) | STATUS_sox |
+| `fdkaac` (**opt-in**) | [nu774/fdkaac](https://github.com/nu774/fdkaac) `vX.Y.Z` tags + newest [mstorsjo/fdk-aac](https://github.com/mstorsjo/fdk-aac) tag | `fdkaac.exe` | STATUS_fdkaac |
+
+### Not built here, because a reliable official Windows build exists
+
+| Tool | Use instead |
+| --- | --- |
+| opusenc (opus-tools) | Official `https://archive.mozilla.org/pub/opus/win64/opus-tools-<v>-win64.zip` (0.2 is still the newest upstream release). |
+| avifenc (libavif) | Official `windows-artifacts.zip` on [AOMediaCodec/libavif releases](https://github.com/AOMediaCodec/libavif/releases). |
+| cwebp (libwebp) | Official Google builds: `https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-<v>-windows-x64.zip`. |
+| mpv | Official `mpv-v<v>-x86_64-pc-windows-msvc.zip` on [mpv-player/mpv releases](https://github.com/mpv-player/mpv/releases) (since 0.41). |
+| Av1an | Official rolling `av1an.exe` on the [rust-av/Av1an `latest` release](https://github.com/rust-av/Av1an/releases/tag/latest). Tagged releases have no binaries. Needs VapourSynth or FFMS2 at run time. |
+| cyanrip | Official `cyanrip-win64.exe` on [cyanreg/cyanrip releases](https://github.com/cyanreg/cyanrip/releases). |
+| faac | Official `faac-<v>-MSYS2-UCRT64.zip` on [knik0/faac releases](https://github.com/knik0/faac/releases). |
+| Tesseract | Skipped: large (language data), and UB-Mannheim publishes the de-facto Windows installer. Not an encoder. |
+
+### fdkaac decision
+
+fdkaac is built, but **only as a clearly labelled opt-in release**. The front end is Zlib-licensed; libfdk-aac is under the Fraunhofer FDK AAC licence, which **does allow binary redistribution** (keep the licence text, make the unmodified source available free of charge) but **grants no patent licence** and is not GPL-compatible. So:
+
+- the release title says "OPT-IN, restricted licence" and the notes explain the licence;
+- the zip carries `NOTICE-libfdk-aac.txt`, `COPYING-fdkaac.txt` and `README-LICENCE.txt`; `BUILDINFO.txt` records both upstream commits;
+- `tool=standard` builds everything except it; RenderForge must keep it out of the default install and behind its licence warning.
+
+If Lewis prefers not to host it at all, delete the `fdkaac-*` releases and remove the entry from `scripts/plan.py`; nothing else depends on it.
 
 ## Release layout (the contract RenderForge relies on)
 

@@ -22,6 +22,8 @@ export CXXFLAGS="${CXXFLAGS:--O2 -pipe}"
 export LDFLAGS="${LDFLAGS:--static -static-libgcc -static-libstdc++}"
 export PKG_CONFIG="pkg-config --static"
 STATIC_LINK="-static -static-libgcc -static-libstdc++"
+# libtool ignores plain -static for libraries it finds as .dll.a; -all-static forces .a.
+LT_STATIC_LDFLAGS="-all-static $STATIC_LINK"
 # CMake 4 refuses projects whose cmake_minimum_required is older than 3.5.
 CMAKE_COMMON=(-G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
               -DCMAKE_POLICY_VERSION_MINIMUM=3.5

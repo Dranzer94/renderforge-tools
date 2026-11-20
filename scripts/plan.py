@@ -116,6 +116,7 @@ TOOLS: dict[str, dict] = {
                     "regex": r"/lame/(\d+\.\d+(?:\.\d+)?)/lame-\1\.tar\.gz"},
         "src": "https://downloads.sourceforge.net/project/lame/lame/{version}/lame-{version}.tar.gz",
         "ref": "{version}",
+        "pkgs": "mpg123:p",
         "notes_url": "https://lame.sourceforge.io/news.php",
         "source_url": "https://sourceforge.net/projects/lame/files/lame/{version}/",
     },
