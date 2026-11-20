@@ -26,7 +26,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: build-tools
+  # One run at a time per tool selection; different selections can run in parallel.
+  group: build-tools-${{ inputs.tool || 'scheduled' }}
   cancel-in-progress: false
 
 jobs:

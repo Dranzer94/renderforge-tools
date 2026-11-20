@@ -2,7 +2,10 @@
 # Static lame.exe (MP3 encoder) from the SourceForge release tarball.
 source "$(dirname "$0")/lib.sh"
 fetch_src
-export CFLAGS="-O2 -std=gnu17"
+# LAME 4.0's Windows-only ID3 code in frontend/parse.c calls the deprecated *_ucs2
+# helpers (still exported by libmp3lame) without a prototype and mixes char/UTF-16
+# pointers. GCC 14+ makes those hard errors; -fpermissive turns them back into warnings.
+export CFLAGS="-O2 -std=gnu17 -fpermissive -Wno-incompatible-pointer-types -Wno-implicit-function-declaration"
 cd "$SRC"
 ./configure --disable-shared --enable-static --enable-nasm --disable-gtktest \
   --disable-dependency-tracking

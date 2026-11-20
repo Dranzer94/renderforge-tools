@@ -12,7 +12,7 @@ cd "$SRC/build/generic"
 make -k -j "$JOBS" || true
 LIB="$(find "$SRC/build/generic" -name '*xvidcore*.a' ! -name '*.dll.a' -print -quit)"
 [ -n "$LIB" ] || { echo "static xvidcore library not built" >&2; exit 1; }
-gcc $CFLAGS $EXAMPLE_DEFS -I"$SRC/src" "$SRC/examples/xvid_encraw.c" "$LIB" -lm $STATIC_LINK \
+gcc $CFLAGS $EXAMPLE_DEFS -I"$SRC/src" "$SRC/examples/xvid_encraw.c" "$LIB" -lvfw32 -lwinmm -lm $STATIC_LINK \
   -o "$WORK/xvid_encraw.exe"
 install_exe "$WORK/xvid_encraw.exe"
 install_doc "$SRC/LICENSE" LICENSE.txt

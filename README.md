@@ -53,33 +53,46 @@ If Lewis prefers not to host it at all, delete the `fdkaac-*` releases and remov
 
 ## Release layout (the contract RenderForge relies on)
 
-- One release per tool and upstream version. Tag: `<tool>-<version>`, for example `x265-4.2` or `svt-av1-4.3.1`.
-- Assets:
-  - `<tool>-<version>-win64.zip`: the exe, the upstream licence file(s), `version.txt` (the exe's own `--version` output) and `BUILDINFO.txt` (upstream tag and commit, compiler, link to the build log).
-  - `checksums.sha256`: `sha256sum` output for the zip.
-- The release notes link to the upstream changelog and source tree.
-- Releases are created with `--latest=false`, so do not use `/releases/latest`. RenderForge lists releases and picks the newest tag with the tool's prefix.
+One pattern for every tool, so a single RenderForge resolver handles them all:
+
+| Item | Pattern | Example |
+| --- | --- | --- |
+| Release tag | `<tool>-<version>` | `vvenc-1.14.0` |
+| Zip asset | `<tool>-<version>-win64.zip`, regex `^<tool>-[0-9.]+-win64\.zip$` | `vvenc-1.14.0-win64.zip` |
+| Checksums | `SHA256SUMS` (`sha256sum` format: `<hex>  <zip name>`). An identical `checksums.sha256` is also attached for older resolvers. GitHub's asset `digest` field carries the same SHA-256. | |
+
+- `<tool>` is the id in the first table (the same as the RenderForge catalogue id). `<version>` is the upstream version without any `v` prefix.
+- The zip holds the exe(s) at its root, the upstream licence file(s), `version.txt` (first line `<tool> <version>`, then the exe's own version or help banner) and `BUILDINFO.txt` (upstream ref and commit or tarball URL, compiler, build-log link).
+- Release notes link the upstream changelog, source and build log, and repeat the SHA-256.
+- Opt-in tools (currently only `fdkaac`) use the same pattern; their release title ends in "OPT-IN, restricted licence" and the notes open with the licence warning.
+- Releases are created with `--latest=false`, so don't use `/releases/latest`. List releases (`GET /repos/Dranzer94/renderforge-tools/releases`), keep tags starting with `<tool>-`, and pick the highest version.
 
 ## How builds run
 
 `.github/workflows/build.yml`:
 
-1. **plan** (Ubuntu): `scripts/plan.py` reads upstream tags with `git ls-remote`, and keeps only tools whose `<tool>-<version>` release does not exist yet (or all of them when `force` is set).
-2. **build** (windows-latest, one job per tool): MSYS2 UCRT64 with GCC, CMake, Ninja and NASM, `scripts/build-<tool>.sh`. It then checks the exe does not need MSYS2 DLLs, zips it, writes the checksum and publishes the release.
+1. **plan** (Ubuntu): `scripts/plan.py` finds each tool's newest upstream version (`git ls-remote` tags, or a regex over the download page/RSS for tarball-only projects: Xvid, LAME, SoX) and keeps only tools whose `<tool>-<version>` release doesn't exist yet (all of them with `force`). A failed upstream lookup only skips that tool.
+2. **build** (windows-latest, one independent job per tool, `fail-fast: false`): MSYS2 UCRT64 with GCC, CMake, Ninja, NASM, pkgconf plus the tool's extra packages, then `scripts/build-<tool>.sh`. Shared helpers live in `scripts/lib.sh` (fetch, static link flags, CMake defaults, install and version helpers). The job then checks no exe needs MSYS2 DLLs, zips, writes `SHA256SUMS` and publishes the release.
 
 Triggers:
 
-- **Weekly schedule** (Mondays 04:17 UTC): builds any new upstream tag.
-- **Manual**: Actions → Build tools → Run workflow, or
-  `gh workflow run build.yml -f tool=x265 -f version=4.1 -f force=true`.
+- **Weekly schedule** (Mondays 04:17 UTC): builds only new upstream versions; tools that are up to date cost nothing beyond the plan job.
+- **Manual**: Actions → Build tools → Run workflow, or for example
+  `gh workflow run build.yml -f tool=x265 -f version=4.1 -f force=true`
+  `tool` takes one id, a comma list (`lame,xvid`), `standard` (all except opt-in) or `all`.
+
+Builds use upstream source unmodified, except for these small Windows build fixes applied by the scripts: vorbis-tools (`share/utf8.c` stub for `convert_free_charset`), SoX (`src/formats.c` pipe-rewind hack disabled), x265 (link-line flag only), SVT-HEVC/SVT-VP9 (relaxed GCC diagnostics only).
 
 ## Adding a tool
 
-1. Add an entry to `TOOLS` in `scripts/plan.py` (git URL, tag regex, changelog URL).
-2. Add `scripts/build-<tool>.sh <git-url> <ref> <out-dir>` that leaves a static exe plus licence file(s) in `<out-dir>`.
-3. Add the tool id to the `tool` choice list in the workflow.
-4. Add or update its licence notes in [LICENSES.md](LICENSES.md).
-5. Point the tool's RenderForge catalogue entry (`data/encoders.json`, source type `curated`) at this repo with `tag_prefix: "<tool>-"`.
+1. Add an entry to `TOOLS` in `scripts/plan.py` (version source, `src`, `ref`, extra `pkgs`, changelog and source URLs).
+2. Add `scripts/build-<tool>.sh <src> <ref> <out-dir>`: `source lib.sh`, then build and leave static exe(s) plus licence file(s) in `$OUT` (see the existing scripts).
+3. Add or update its licence notes in [LICENSES.md](LICENSES.md).
+4. Point the tool's RenderForge catalogue entry (`data/encoders.json`, source type `curated`) at this repo with `tag_prefix: "<tool>-"` and the asset regex above.
+
+## Blocked or skipped tools
+
+BLOCKERS
 
 ## Visibility
 
