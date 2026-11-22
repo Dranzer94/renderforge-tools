@@ -13,12 +13,17 @@ Each TOOLS entry:
   version   how to find the newest upstream version:
             {"git": url, "regex": r"..."}  newest tag matching regex (group 1 = version)
             {"http": url, "regex": r"..."} newest regex match in a web page/feed
+            {"describe": url, "branch": b, "match": glob}  snapshot of a branch, named by
+                `git describe --tags` without the leading "v" (e.g. 0.2-59-g4110587); for
+                projects whose last tag is years behind their branch
   src       what the build script fetches: a git URL, or a tarball URL template
   ref       git tag template (ignored for tarballs; the version is passed instead)
   pkgs      extra MSYS2 UCRT64 packages (pacboy names, ":p" suffix) for this tool
   notes_url, source_url   templates for the release notes
   optin     True for tools with licence restrictions; their releases are labelled
             as opt-in and they are skipped by "standard" (but included in "all")
+  source_archive  True to also attach <tool>-<version>-source.tar.gz (the exact upstream
+            source, `git archive` of the built commit) to the release, e.g. for LGPL tools
 """
 from __future__ import annotations
 
@@ -152,12 +157,25 @@ TOOLS: dict[str, dict] = {
         "source_url": "https://sourceforge.net/projects/sox/files/sox/{version}/",
     },
     "opus-tools": {
-        "version": {"git": "https://gitlab.xiph.org/xiph/opus-tools.git", "regex": rf"^v{SEMVER}$"},
-        "src": "https://downloads.xiph.org/releases/opus/opus-tools-{version}.tar.gz",
-        "ref": "{version}",
-        "pkgs": "libogg:p opus:p opusfile:p libopusenc:p flac:p",
-        "notes_url": "https://gitlab.xiph.org/xiph/opus-tools/-/tags/v{version}",
-        "source_url": "https://downloads.xiph.org/releases/opus/opus-tools-{version}.tar.gz",
+        # The last tag (v0.2) is from 2018; master has years of fixes. Build master snapshots,
+        # named by git describe (0.2-59-g4110587), against current libopus/opusfile/libopusenc.
+        "version": {"describe": "https://gitlab.xiph.org/xiph/opus-tools.git", "branch": "master",
+                    "match": "v[0-9]*"},
+        "src": "https://gitlab.xiph.org/xiph/opus-tools.git",
+        "ref": "master",
+        "pkgs": "autotools:p libogg:p opus:p opusfile:p libopusenc:p flac:p",
+        "notes_url": "https://gitlab.xiph.org/xiph/opus-tools/-/commits/master",
+        "source_url": "https://gitlab.xiph.org/xiph/opus-tools/-/tree/{commit}",
+    },
+    "mp4box": {
+        # GPAC's MP4Box only, LGPL-2.1+, built with zlib and nothing else (see build-mp4box.sh).
+        "version": {"git": "https://github.com/gpac/gpac.git", "regex": rf"^v{SEMVER}$"},
+        "src": "https://github.com/gpac/gpac.git",
+        "ref": "v{version}",
+        "pkgs": "zlib:p",
+        "source_archive": True,
+        "notes_url": "https://github.com/gpac/gpac/releases/tag/v{version}",
+        "source_url": "https://github.com/gpac/gpac/tree/v{version} (also attached: mp4box-{version}-source.tar.gz)",
     },
     "webp": {
         "version": {"git": "https://chromium.googlesource.com/webm/libwebp", "regex": rf"^v{SEMVER}$"},
@@ -207,8 +225,24 @@ def _http_versions(url: str, regex: str) -> list[str]:
     return [m.group(1) for m in re.finditer(regex, text)]
 
 
+def _describe_version(url: str, branch: str, match: str) -> str:
+    """``git describe --tags`` of a branch head, without the leading "v" (e.g. ``0.2-59-g4110587``)."""
+    import tempfile  # noqa: PLC0415
+    with tempfile.TemporaryDirectory() as tmp:
+        subprocess.run(["git", "clone", "-q", "--filter=blob:none", "--no-checkout", "--branch", branch, url, tmp],
+                       check=True, capture_output=True, text=True, timeout=300)
+        out = subprocess.run(["git", "-C", tmp, "describe", "--tags", "--long", "--abbrev=7", "--match", match],
+                             check=True, capture_output=True, text=True, timeout=60).stdout.strip()
+    version = out[1:] if out.startswith("v") else out
+    if not re.fullmatch(r"\d+(?:\.\d+)*-\d+-g[0-9a-f]+", version):
+        raise RuntimeError(f"unexpected git describe output {out!r}")
+    return version
+
+
 def latest_upstream_version(tool: str) -> str:
     spec = TOOLS[tool]["version"]
+    if "describe" in spec:
+        return _describe_version(spec["describe"], spec.get("branch", "master"), spec.get("match", "v*"))
     if "git" in spec:
         versions = _git_versions(spec["git"], spec["regex"])
     else:
@@ -253,6 +287,7 @@ def main() -> int:
             continue
         spec = TOOLS[tool]
         ref = spec["ref"].format(version=version)
+        commit = version.rsplit("-g", 1)[1] if re.search(r"-g[0-9a-f]+$", version) else ref
         include.append({
             "tool": tool,
             "version": version,
@@ -261,8 +296,9 @@ def main() -> int:
             "src": spec["src"].format(version=version),
             "pkgs": f"{BASE_PKGS} {spec.get('pkgs', '')}".strip(),
             "optin": bool(spec.get("optin")),
-            "notes_url": spec["notes_url"].format(version=version, ref=ref),
-            "source_url": spec["source_url"].format(version=version, ref=ref),
+            "source_archive": bool(spec.get("source_archive")),
+            "notes_url": spec["notes_url"].format(version=version, ref=ref, commit=commit),
+            "source_url": spec["source_url"].format(version=version, ref=ref, commit=commit),
         })
     matrix = json.dumps({"include": include})
     print(matrix)

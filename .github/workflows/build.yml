@@ -6,7 +6,7 @@ on:
       tool:
         description: >-
           Tool id (x265, svt-av1, aom, dav1d, vpx, uvg266, vvenc, vvdec, svt-hevc, svt-vp9,
-          xvid, lame, exhale, speex, vorbis-tools, sox, opus-tools, webp, fdkaac), a comma list,
+          xvid, lame, exhale, speex, vorbis-tools, sox, opus-tools, webp, mp4box, fdkaac), a comma list,
           "standard" (everything except opt-in tools) or "all"
         type: string
         default: all
@@ -107,7 +107,12 @@ jobs:
           } > "$dir/BUILDINFO.txt"
           mkdir -p dist
           (cd "$dir" && zip -9 -r "../../dist/$name.zip" .)
-          (cd dist && sha256sum "$name.zip" > SHA256SUMS && cp SHA256SUMS checksums.sha256 && cat SHA256SUMS)
+          # Tools marked source_archive (LGPL MP4Box) also ship the exact upstream source.
+          if [ "${{ matrix.source_archive }}" = "true" ]; then
+            cp "work-${{ matrix.tool }}/source.tar.gz" "dist/${{ matrix.tool }}-${{ matrix.version }}-source.tar.gz"
+          fi
+          (cd dist && sha256sum *.zip *.tar.gz 2>/dev/null > SHA256SUMS || sha256sum *.zip > SHA256SUMS)
+          (cd dist && cp SHA256SUMS checksums.sha256 && cat SHA256SUMS)
           unzip -l "dist/$name.zip"
 
       - name: Publish release
@@ -116,7 +121,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          sha=$(cut -d' ' -f1 dist/SHA256SUMS)
+          sha=$(grep -- "-win64.zip" dist/SHA256SUMS | cut -d' ' -f1)
           title="${{ matrix.tool }} ${{ matrix.version }} (Windows x64)"
           optin_note=""
           if [ "${{ matrix.optin }}" = "true" ]; then
@@ -138,9 +143,9 @@ jobs:
           NOTES
           sed -i 's/^          //' notes.md
           if gh release view "${{ matrix.tag }}" >/dev/null 2>&1; then
-            gh release upload "${{ matrix.tag }}" dist/*.zip dist/SHA256SUMS dist/checksums.sha256 --clobber
+            gh release upload "${{ matrix.tag }}" dist/*.zip $(ls dist/*.tar.gz 2>/dev/null) dist/SHA256SUMS dist/checksums.sha256 --clobber
             gh release edit "${{ matrix.tag }}" --title "$title" --notes-file notes.md
           else
-            gh release create "${{ matrix.tag }}" dist/*.zip dist/SHA256SUMS dist/checksums.sha256 \
+            gh release create "${{ matrix.tag }}" dist/*.zip $(ls dist/*.tar.gz 2>/dev/null) dist/SHA256SUMS dist/checksums.sha256 \
               --title "$title" --notes-file notes.md --latest=false
           fi
